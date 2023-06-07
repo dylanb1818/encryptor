@@ -5,50 +5,66 @@
 #include <stdbool.h>
 #include <math.h>
 
-
-int ASCII_val(char c);
+char* ASCII_val(char c);
 int find_pq(int lower, int upper);
 bool isPrime(int n);
 int GCD(int num1, int num2);
 int calculate_e(long long int lambda);
 int extended_euclidean(int e, int lambda, int *x, int *y);
 int calculate_d(int e, int lambda);
+int read_msg();
 
 int main()
 {   
     long long int p = find_pq(1000000, 10000000);
-    long long int q = find_pq(100000000, 1000000000);
-    
-    // bool c = isPrime(p);
-    // bool d = isPrime(q);
-
-    printf("%lld, %lld\n", p, q);
-    
+    long long int q = find_pq(100000000, 1000000000);    
     long long int n = p * q;
-
     long long int gcd = GCD(p-1, q-1);
-    printf("GCD: %lld\n", gcd);
-
     long long int lambda = ((p-1)*(q-1))/gcd;
-    printf("lambda: %lld\n", lambda);
-
     int e = calculate_e(lambda);
-
-    printf("e: %d\n", e);
-
     int d = calculate_d(lambda, e);
-    
-    printf("d: %d\n", d);
 
+    printf("p, q: %lld, %lld\n", p, q);
+    printf("GCD: %lld\n", gcd);
+    printf("lambda: %lld\n", lambda);
+    printf("e: %d\n", e);
+    printf("d: %d\n", d);
+    
+    char* t = ASCII_val('H');
+    printf("%s\n", t);
+
+    read_msg();
 
     return 0;
 }
 
-int ASCII_val(char c) {
+int read_msg() {
+    FILE *file = fopen("sample_message.txt", "r");
+    if (file == NULL) {
+        printf("Failed to open the file.\n");
+        return 1;
+    }
+
+    char message[100];
+    char total_message[1000] = "";
+
+    while (fgets(message, sizeof(message), file) != NULL) {
+        strcat(total_message, message);
+    }
+
+    printf("Read message:\n%s\n", total_message);
+
+    fclose(file);
+    return 0;
+}
+
+char* ASCII_val(char c) {
     int asciiVal = c;
-    asciiVal++;
-    char character = (char)asciiVal;
-    return character;
+    char* str = (char*) malloc(4 * sizeof(char));
+
+    sprintf(str, "%d", asciiVal);
+
+    return str;
 }
 
 int find_pq(int lower, int upper) {
