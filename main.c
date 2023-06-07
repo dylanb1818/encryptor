@@ -3,19 +3,24 @@
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
+#include <math.h>
+
 
 int ASCII_val(char c);
 int find_pq(int lower, int upper);
 bool isPrime(int n);
 int GCD(int num1, int num2);
+int calculate_e(long long int lambda);
+int extended_euclidean(int e, int lambda, int *x, int *y);
+int calculate_d(int e, int lambda);
 
 int main()
 {   
     long long int p = find_pq(1000000, 10000000);
     long long int q = find_pq(100000000, 1000000000);
     
-    bool c = isPrime(p);
-    bool d = isPrime(q);
+    // bool c = isPrime(p);
+    // bool d = isPrime(q);
 
     printf("%lld, %lld\n", p, q);
     
@@ -26,6 +31,15 @@ int main()
 
     long long int lambda = ((p-1)*(q-1))/gcd;
     printf("lambda: %lld\n", lambda);
+
+    int e = calculate_e(lambda);
+
+    printf("e: %d\n", e);
+
+    int d = calculate_d(lambda, e);
+    
+    printf("d: %d\n", d);
+
 
     return 0;
 }
@@ -51,7 +65,6 @@ int find_pq(int lower, int upper) {
     return num;
 }
 
-
 bool isPrime(int n)
 {
     if (n == 2 || n == 3)
@@ -67,6 +80,15 @@ bool isPrime(int n)
     }
 
     return true;
+}
+
+int calculate_e(long long int lambda) {
+    int e = 65537;
+    while (GCD(lambda, e) != 1) {
+        e++;
+    }
+
+    return e;
 }
 
 int GCD(int num1, int num2) {
@@ -94,4 +116,29 @@ int GCD(int num1, int num2) {
 
     gcd = denominator;
     return gcd;
+}
+
+
+int extended_euclidean(int e, int lambda, int *x, int *y) {
+    if (lambda == 0) {
+        *x = 1;
+        *y = 0;
+        return e;
+    }
+
+    int x_prev, y_prev;
+    int gcd = extended_euclidean(lambda, e % lambda, &x_prev, &y_prev);
+
+    *x = y_prev;
+    *y = x_prev - (e / lambda) * y_prev;
+
+    return gcd;
+}
+
+int calculate_d(int e, int lambda) {
+    int x, y;
+    int gcd = extended_euclidean(e, lambda, &x, &y);
+    int d = x % lambda;
+
+    return d < 0 ? d + lambda : d;
 }
