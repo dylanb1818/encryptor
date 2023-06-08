@@ -12,7 +12,8 @@ int GCD(int num1, int num2);
 int calculate_e(long long int lambda);
 int extended_euclidean(int e, int lambda, int *x, int *y);
 int calculate_d(int e, int lambda);
-int read_msg();
+char* read_msg();
+char* convert_char_to_str(char* msg);
 
 int main()
 {   
@@ -24,47 +25,82 @@ int main()
     int e = calculate_e(lambda);
     int d = calculate_d(lambda, e);
 
+// Used for key generation and preliminary stuff
     printf("p, q: %lld, %lld\n", p, q);
     printf("GCD: %lld\n", gcd);
     printf("lambda: %lld\n", lambda);
     printf("e: %d\n", e);
     printf("d: %d\n", d);
-    
-    char* t = ASCII_val('H');
-    printf("%s\n", t);
 
-    read_msg();
+// Converting message into ASCII values and numbers
+    char* msg = read_msg();
+    char* e_msg = convert_char_to_str(msg);
+    
+    printf("%s\n", e_msg);
 
     return 0;
 }
 
-int read_msg() {
+char* read_msg() {
     FILE *file = fopen("sample_message.txt", "r");
     if (file == NULL) {
         printf("Failed to open the file.\n");
-        return 1;
+        return NULL;
     }
 
     char message[100];
-    char total_message[1000] = "";
+    size_t total_message_size = 1000;
+    char* total_message = malloc(total_message_size * sizeof(char));
+    total_message[0] = '\0';
 
     while (fgets(message, sizeof(message), file) != NULL) {
+        size_t message_length = strlen(message);
+        size_t current_length = strlen(total_message);
+
+        if (current_length + message_length >= total_message_size) {
+            total_message_size *= 2;
+            total_message = realloc(total_message, total_message_size * sizeof(char));
+        }
+
         strcat(total_message, message);
     }
 
-    printf("Read message:\n%s\n", total_message);
-
     fclose(file);
-    return 0;
+    return total_message;
 }
 
 char* ASCII_val(char c) {
     int asciiVal = c;
     char* str = (char*) malloc(4 * sizeof(char));
-
     sprintf(str, "%d", asciiVal);
 
+    if (strlen(str) == 2) {
+        str[2] = '0';
+    }
+
     return str;
+}
+
+char* convert_char_to_str(char* msg) {
+    size_t msglen = strlen(msg);
+    size_t e_msg_size = 1000;
+    char* e_msg = malloc(e_msg_size * sizeof(char));
+    e_msg[0] = '\0';
+
+    for (int i = 0; i < msglen; i++) {
+        char* ASCII_component = ASCII_val(msg[i]);
+        size_t component_len = strlen(ASCII_component);
+        size_t e_msg_len = strlen(e_msg);
+
+        if (component_len + e_msg_len >= e_msg_size) {
+            e_msg_size *= 2;
+            e_msg = realloc(e_msg, e_msg_size * sizeof(char));
+        }
+
+        strcat(e_msg, ASCII_component);
+    }
+    
+    return e_msg;
 }
 
 int find_pq(int lower, int upper) {
