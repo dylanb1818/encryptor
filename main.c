@@ -4,6 +4,7 @@
 #include <time.h>
 #include <stdbool.h>
 #include <math.h>
+// #include <gmp.h>
 
 char* ASCII_val(char c);
 int find_pq(int lower, int upper);
@@ -14,6 +15,7 @@ int extended_euclidean(int e, int lambda, int *x, int *y);
 int calculate_d(int e, int lambda);
 char* read_msg();
 char* convert_char_to_str(char* msg);
+long long int encrypt_msg(long long int m, int e, long long int n);
 
 int main()
 {   
@@ -36,7 +38,12 @@ int main()
     char* msg = read_msg();
     char* e_msg = convert_char_to_str(msg);
     
-    printf("%s\n", e_msg);
+    printf("e_msg: %s\n", e_msg);
+
+    long long int int_e_msg = strtoll(e_msg, NULL, 10);
+    
+    long long int t = encrypt_msg(int_e_msg, e, n);
+    printf("c(m): %lld", t);
 
     return 0;
 }
@@ -193,4 +200,25 @@ int calculate_d(int e, int lambda) {
     int d = x % lambda;
 
     return d < 0 ? d + lambda : d;
+}
+
+long long int encrypt_msg(long long int m, int e, long long int n) {
+    long long int result = 1;
+    
+    while (e > 0) {
+        printf("result: %lld\n", result);
+
+        if (e % 2 == 1) {
+            printf("---\n");
+            printf("%lld, %lld\n", result, m);
+            long long int t = result * m;
+            printf("t: %lld\n", t);
+            printf("---\n");
+
+            result = (result * m) % n;
+        }
+        m = (m * m) % n;
+        e /= 2;
+    }
+    return result;
 }
