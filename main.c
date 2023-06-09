@@ -16,6 +16,7 @@ int calculate_d(int e, int lambda);
 char* read_msg();
 char* convert_char_to_str(char* msg);
 long long int encrypt_msg(long long int m, int e, long long int n);
+long long int decrypt_msg(long long int c, int d, long long int n);
 
 int main()
 {   
@@ -33,17 +34,23 @@ int main()
     printf("lambda: %lld\n", lambda);
     printf("e: %d\n", e);
     printf("d: %d\n", d);
+    printf("n: %lld\n", n);
 
 // Converting message into ASCII values and numbers
     char* msg = read_msg();
     char* e_msg = convert_char_to_str(msg);
     
-    printf("e_msg: %s\n", e_msg);
-
+    
     long long int int_e_msg = strtoll(e_msg, NULL, 10);
     
-    long long int t = encrypt_msg(int_e_msg, e, n);
-    printf("c(m): %lld", t);
+    printf("###########################################\n");
+    printf("int_e_msg: %lld\n", int_e_msg);
+
+    long long int c = encrypt_msg(int_e_msg, e, n);
+    printf("c(m): %lld\n", c);
+    long long int decrypted_msg = decrypt_msg(c, d, n);
+   
+    printf("m: %lld\n", decrypted_msg);
 
     return 0;
 }
@@ -142,7 +149,7 @@ bool isPrime(int n)
 }
 
 int calculate_e(long long int lambda) {
-    int e = 65537;
+    int e = 3;
     while (GCD(lambda, e) != 1) {
         e++;
     }
@@ -204,21 +211,24 @@ int calculate_d(int e, int lambda) {
 
 long long int encrypt_msg(long long int m, int e, long long int n) {
     long long int result = 1;
-    
     while (e > 0) {
-        printf("result: %lld\n", result);
-
         if (e % 2 == 1) {
-            printf("---\n");
-            printf("%lld, %lld\n", result, m);
-            long long int t = result * m;
-            printf("t: %lld\n", t);
-            printf("---\n");
-
             result = (result * m) % n;
         }
         m = (m * m) % n;
         e /= 2;
+    }
+    return result;
+}
+
+long long int decrypt_msg(long long int c, int d, long long int n) {
+    long long int result = 1;
+    while (d > 0) {
+        if (d % 2 == 1) {
+            result = (result * d) % n;
+        }
+        c = (c * c) % n;
+        d /= 2;
     }
     return result;
 }
