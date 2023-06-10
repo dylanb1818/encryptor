@@ -4,7 +4,6 @@
 #include <time.h>
 #include <stdbool.h>
 #include <math.h>
-// #include <gmp.h>
 
 char* ASCII_val(char c);
 int find_pq(int lower, int upper);
@@ -17,41 +16,32 @@ char* read_msg();
 char* convert_char_to_str(char* msg);
 long long int encrypt_msg(long long int m, int e, long long int n);
 long long int decrypt_msg(long long int c, int d, long long int n);
+int getLength(long long int num);
+char* decrypt_message_to_char(long long int m);
 
 int main()
 {   
-    long long int p = find_pq(1000000, 10000000);
-    long long int q = find_pq(100000000, 1000000000);    
+    long long int p = find_pq(100, 1000);
+    long long int q = find_pq(1000, 10000);    
     long long int n = p * q;
-    long long int gcd = GCD(p-1, q-1);
-    long long int lambda = ((p-1)*(q-1))/gcd;
+    long long int lambda = (p-1)*(q-1);
     int e = calculate_e(lambda);
-    int d = calculate_d(lambda, e);
-
-// Used for key generation and preliminary stuff
-    printf("p, q: %lld, %lld\n", p, q);
-    printf("GCD: %lld\n", gcd);
-    printf("lambda: %lld\n", lambda);
-    printf("e: %d\n", e);
-    printf("d: %d\n", d);
-    printf("n: %lld\n", n);
+    int d = calculate_d(e, lambda);
 
 // Converting message into ASCII values and numbers
     char* msg = read_msg();
     char* e_msg = convert_char_to_str(msg);
-    
-    
     long long int int_e_msg = strtoll(e_msg, NULL, 10);
-    
-    printf("###########################################\n");
-    printf("int_e_msg: %lld\n", int_e_msg);
-
     long long int c = encrypt_msg(int_e_msg, e, n);
-    printf("c(m): %lld\n", c);
     long long int decrypted_msg = decrypt_msg(c, d, n);
-   
-    printf("m: %lld\n", decrypted_msg);
+    char* actual_msg = decrypt_message_to_char(decrypted_msg);
 
+    if (int_e_msg == decrypted_msg) {
+        printf("1");
+    }
+    else {
+        printf("0");
+    }
     return 0;
 }
 
@@ -184,7 +174,6 @@ int GCD(int num1, int num2) {
     return gcd;
 }
 
-
 int extended_euclidean(int e, int lambda, int *x, int *y) {
     if (lambda == 0) {
         *x = 1;
@@ -225,10 +214,61 @@ long long int decrypt_msg(long long int c, int d, long long int n) {
     long long int result = 1;
     while (d > 0) {
         if (d % 2 == 1) {
-            result = (result * d) % n;
+            result = (result * c) % n;
         }
         c = (c * c) % n;
         d /= 2;
     }
     return result;
+}
+
+int getLength(long long int num) {
+    int length = 0;
+    if (num == 0) {
+        length = 1;
+    } else {
+        while (num != 0) {
+            num /= 10;
+            length++;
+        }
+    }
+    return length;
+}
+
+char* decrypt_message_to_char(long long int m) {
+    int len_m = getLength(m);
+    char msg[20];
+    sprintf(msg, "%lld", m);    
+    char* string_msg = malloc((len_m + 1) * sizeof(char));
+    string_msg[0] = '\0';
+    
+    int i = 0;
+    while (i < len_m) {
+        char first[2];
+        char second[2];
+        char third[2];
+        strncpy(first, &msg[i], 1);
+        strncpy(second, &msg[i + 1], 1);
+        strncpy(third, &msg[i + 2], 1);
+        first[1] = '\0';
+        second[1] = '\0';
+        third[1] = '\0';
+        
+        int bit = atoi(first) * 100 + atoi(second) * 10 + atoi(third);
+        
+        i += 3;
+
+        if (bit < 320) {
+            string_msg[strlen(string_msg)] = (char)bit;
+        }
+        else if (bit == 320) {
+            string_msg[strlen(string_msg)] = ' ';
+        }
+        else {
+            bit = bit / 10;
+            string_msg[strlen(string_msg)] = (char)bit;
+        }
+    }
+    
+    return string_msg;
 }
