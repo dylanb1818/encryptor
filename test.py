@@ -12,9 +12,6 @@ for test in test_cases:
     
     stdout, _ = process.communicate(input=input_value.encode())
     actual_output = stdout.decode().strip()
-    print('-------')
-    print(actual_output)
-    print('-------')
 
     if actual_output == expected_output:
         print('Test case passed')
