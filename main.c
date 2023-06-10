@@ -36,6 +36,10 @@ int main()
     long long int decrypted_msg = decrypt_msg(c, d, n);
     char* actual_msg = decrypt_message_to_char(decrypted_msg);
 
+    printf("m: %lld\n", int_e_msg);
+    printf("c(m): %lld\n", c);
+    printf("Original Message after Encryption and then Decryption: %s\n", actual_msg);
+
     if (int_e_msg == decrypted_msg) {
         printf("1");
     }
